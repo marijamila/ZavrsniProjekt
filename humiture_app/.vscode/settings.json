@@ -1,0 +1,24 @@
+{
+    "idf.portWin": "COM8",
+    "idf.adapterTargetName": "esp32c3",
+    "idf.openOcdConfigs": [
+        "board/esp32c3-builtin.cfg"
+    ],
+    "idf.flashType": "UART",
+    "files.associations": {
+        "esp_rmaker_standard_devices.h": "c",
+        "app_priv.h": "c",
+        "esp_rmaker_core.h": "c",
+        "rmaker_device.h": "c",
+        "app_insights.h": "c",
+        "am2320.h": "c",
+        "i2c_master.h": "c",
+        "stdbool.h": "c",
+        "notifications.h": "c",
+        "esp_rmaker_standard_params.h": "c",
+        "esp_wifi.h": "c",
+        "esp_sleep.h": "c",
+        "esp_timer.h": "c",
+        "esp_pm.h": "c"
+    }
+}
