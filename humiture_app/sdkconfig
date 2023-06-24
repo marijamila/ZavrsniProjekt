@@ -373,10 +373,8 @@ CONFIG_SHTC3_MODE=0x7CA2
 # end of SHTC3 Sensor
 
 #
-# Power Management Configuration
+# Power Management
 #
-CONFIG_WIFI_SSID="DESKTOP-3AAA068 1435"
-CONFIG_WIFI_PASSWORD="Ee42^349"
 CONFIG_WIFI_LISTEN_INTERVAL=3
 CONFIG_WIFI_BEACON_TIMEOUT=6
 # CONFIG_POWER_SAVE_NONE is not set
@@ -389,7 +387,7 @@ CONFIG_MAX_CPU_FREQ_MHZ=80
 # CONFIG_MIN_CPU_FREQ_20M is not set
 CONFIG_MIN_CPU_FREQ_10M=y
 CONFIG_MIN_CPU_FREQ_MHZ=10
-# end of Power Management Configuration
+# end of Power Management
 # end of Project Configuration
 
 #

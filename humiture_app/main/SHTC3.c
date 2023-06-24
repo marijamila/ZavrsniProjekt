@@ -40,8 +40,8 @@ esp_err_t SHTC3_start_measurement(i2c_port_t i2c_num) {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, SHTC3_SENSOR_ADDRESS << 1 | WRITE_BIT, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, SHTC3_MEAS_T_RH_CLOCKSTR_EN >> 8, ACK_CHECK_EN);
-    i2c_master_write_byte(cmd, SHTC3_MEAS_T_RH_CLOCKSTR_EN & 0xFF, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, SHTC3_MEAS >> 8, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, SHTC3_MEAS & 0xFF, ACK_CHECK_EN);
     i2c_master_stop(cmd);
     esp_err_t err = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
@@ -223,10 +223,9 @@ bool SHTC3_check_CRC(uint8_t data[], uint8_t num_of_bytes, uint8_t checksum){
 /*
  * 1. wake sensor up
  * 2. start measurement
- * 3. wait for 12.1 ms
- * 4. read data
- * 5. validate data and calculate real values
- * 6. set sensor to sleep mode
+ * 3. read data
+ * 4. validate data and calculate real values
+ * 5. set sensor to sleep mode
  */
 esp_err_t SHTC3_get_temp_and_humid(i2c_port_t i2c_num,  float *temp, float *humid) {
     esp_err_t err = SHTC3_wakeup(i2c_num);
@@ -235,8 +234,6 @@ esp_err_t SHTC3_get_temp_and_humid(i2c_port_t i2c_num,  float *temp, float *humi
     do {
         err = SHTC3_start_measurement(i2c_num);   /* sensor sometimes sends NACK instead of ACK here, hence do-while loop*/
     } while (err != ESP_OK);
-
-    vTaskDelay(12.1 / portTICK_PERIOD_MS);
     
     if (SHTC3_MEAS == SHTC3_MEAS_T_RH_CLOCKSTR_EN)          err = SHTC3_measure_and_read_1(i2c_num);
     else if (SHTC3_MEAS == SHTC3_MEAS_RH_T_CLOCKSTR_EN)     err = SHTC3_measure_and_read_2(i2c_num);

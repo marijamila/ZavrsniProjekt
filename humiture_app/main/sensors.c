@@ -7,7 +7,6 @@
 #include <esp_rmaker_standard_params.h> 
 #include <app_reset.h>
 #include <string.h>
-#include <esp_sleep.h>
 #include <esp_timer.h>
 #include <math.h>
 
@@ -20,10 +19,8 @@
 static const char *TAG1 = "SHTC3";
 static const char *TAG2 = "AM2320";
 
-// SemaphoreHandle_t i2c_mux = NULL;
-
-esp_timer_handle_t AM2320_timer;
 esp_timer_handle_t SHTC3_timer;
+esp_timer_handle_t AM2320_timer;
 
 static float SHTC3_temperature;
 static float SHTC3_humidity;
@@ -41,19 +38,8 @@ static int8_t AM2320_t_high = MAX_TEMP_AM2320;
 static uint8_t AM2320_h_low = MIN_HUMID;
 static uint8_t AM2320_h_high = MAX_HUMID;
 
-void go_to_sleep(void) {
-    esp_sleep_enable_timer_wakeup(esp_timer_get_next_alarm() - esp_timer_get_time() - 10000);
-    // esp_sleep_enable_timer_wakeup(2 * 60 * 1000000);
-    esp_light_sleep_start();
-}
-
 /* Tasks for measuring, updating values and sending notifications */
 static void SHTC3_measure(void* arg) {
-    // esp_err_t err;
-
-    // while (1) {
-    //     TickType_t currTick = xTaskGetTickCount();
-    //     xSemaphoreTake(i2c_mux, portMAX_DELAY);
         
     esp_err_t err = SHTC3_get_temp_and_humid(I2C_MASTER_NUM, &SHTC3_temperature, &SHTC3_humidity);
     if (err == ESP_OK) {
@@ -98,20 +84,9 @@ static void SHTC3_measure(void* arg) {
         }
     }
 
-    go_to_sleep();
-        // xSemaphoreGive(i2c_mux);
-    //     vTaskDelayUntil(&currTick, (SHTC3_meas_int * 60000)/2 / portTICK_PERIOD_MS);
-    // }
-    // vSemaphoreDelete(i2c_mux);
-    // vTaskDelete(NULL);
 }
 
 static void AM2320_measure(void* arg) {
-    // esp_err_t err;
-
-    // while(1) {    
-    //     TickType_t currTick = xTaskGetTickCount();
-    //     xSemaphoreTake(i2c_mux, portMAX_DELAY);
 
     esp_err_t err = AM2320_get_temp_and_humid(I2C_MASTER_NUM, &AM2320_temperature, &AM2320_humidity);
     if (err == ESP_OK) {
@@ -150,12 +125,6 @@ static void AM2320_measure(void* arg) {
         }
     }
 
-    go_to_sleep();
-    //     xSemaphoreGive(i2c_mux);
-    //     vTaskDelayUntil(&currTick, (AM2320_meas_int * 6000)/2 / portTICK_PERIOD_MS);
-    // }
-    // vSemaphoreDelete(i2c_mux);
-    // vTaskDelete(NULL);
 }
 
 /* Functions for setting variables for notifications */
@@ -204,7 +173,7 @@ void AM2320_set_high_humid(uint8_t val) {
     AM2320_h_high = val;
 }
 
-/* Get functions for the app  */
+/* Get functions for the app */
 float SHTC3_get_current_temperature() {
     return SHTC3_temperature;
 }
@@ -238,12 +207,6 @@ void app_task_init() {
     };
     ESP_ERROR_CHECK(esp_timer_create(&AM2320_timer_args, &AM2320_timer));
 
-    ESP_ERROR_CHECK(esp_timer_start_periodic(SHTC3_timer, SHTC3_meas_int * 60000000));
+    ESP_ERROR_CHECK(esp_timer_start_periodic(SHTC3_timer, SHTC3_meas_int * 60000000));  /* second parameter is time in us*/
     ESP_ERROR_CHECK(esp_timer_start_periodic(AM2320_timer, AM2320_meas_int * 60000000));
-
-
-    // i2c_mux = xSemaphoreCreateMutex();
-
-    // xTaskCreate(SHTC3_measure, "SHTC3_measure", 4096, NULL, 10, NULL);
-    // xTaskCreate(AM2320_measure, "AM2320_measure", 4096, NULL, 10, NULL);
 }

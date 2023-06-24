@@ -19,9 +19,6 @@
 #include "rmaker_device.h"
 #include "app_priv.h"
 
-#define DEFAULT_SSID CONFIG_WIFI_SSID
-#define DEFAULT_PWD CONFIG_WIFI_PASSWORD
-
 #define DEFAULT_LISTEN_INTERVAL CONFIG_WIFI_LISTEN_INTERVAL
 #define DEFAULT_BEACON_TIMEOUT  CONFIG_WIFI_BEACON_TIMEOUT
 
@@ -40,7 +37,7 @@ static const char *TAG = "main";
 esp_rmaker_device_t *SHTC3;
 esp_rmaker_device_t *AM2320;
 
-
+/* Callback function for SHTC3 sensor */
 static esp_err_t SHTC3_write_cb(const esp_rmaker_device_t *device, const esp_rmaker_param_t *param,
                                 const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx) {
     if (ctx) {
@@ -63,6 +60,7 @@ static esp_err_t SHTC3_write_cb(const esp_rmaker_device_t *device, const esp_rma
     return ESP_OK;
 }
 
+/* Callback function for AM2320 sensor */
 static esp_err_t AM2320_write_cb(const esp_rmaker_device_t *device, const esp_rmaker_param_t *param,
                                  const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx) {
     if (ctx) {
@@ -83,24 +81,6 @@ static esp_err_t AM2320_write_cb(const esp_rmaker_device_t *device, const esp_rm
 
     esp_rmaker_param_update_and_report(param, val);
     return ESP_OK;
-}
-
-static void wifi_power_save(void) {
-
-    // wifi_config_t wifi_config;
-    // wifi_config.sta.listen_interval = DEFAULT_LISTEN_INTERVAL;
-     wifi_config_t wifi_config = {
-        .sta = {
-            .ssid = DEFAULT_SSID,
-            .password = DEFAULT_PWD,
-            .listen_interval = DEFAULT_LISTEN_INTERVAL,
-        },
-    };
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_set_inactive_time(WIFI_IF_STA, DEFAULT_BEACON_TIMEOUT));
-
-    esp_wifi_set_ps(DEFAULT_PS_MODE);
 }
 
 void app_main(void) {
@@ -173,6 +153,15 @@ void app_main(void) {
     /* Start the ESP RainMaker agent */
     esp_rmaker_start();
 
+    /* Wi-Fi power save */
+    wifi_config_t wifi_config;
+    wifi_config.sta.listen_interval = DEFAULT_LISTEN_INTERVAL;
+
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_set_inactive_time(WIFI_IF_STA, DEFAULT_BEACON_TIMEOUT));
+
+    esp_wifi_set_ps(DEFAULT_PS_MODE);
+
     /* Start the Wi-Fi */
     err = app_wifi_start(POP_TYPE_RANDOM);
     if (err != ESP_OK) {
@@ -180,8 +169,7 @@ void app_main(void) {
         vTaskDelay(5000/portTICK_PERIOD_MS);
         abort();
     }
-    wifi_power_save();
-
+    
     /* Initialize I2C master and tasks for measuring */
     app_task_init();
 }

@@ -19,6 +19,7 @@
         "esp_wifi.h": "c",
         "esp_sleep.h": "c",
         "esp_timer.h": "c",
-        "esp_pm.h": "c"
+        "esp_pm.h": "c",
+        "esp_event.h": "c"
     }
 }

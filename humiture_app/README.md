@@ -12,6 +12,7 @@ Open the project configuration menu (`idf.py menuconfig`). Then go into `Project
 
 - In the `I2C Master` submenu, you can set the pin number of SDA/SCL according to your board. GPIO3 and GPIO2 are set as default for SDA and SCL.
 - In the `SHTC3 Sensor` submenu, you can choose one of 4 operation modes for this sensor. The differences between modes are whether clock stretching is enabled or disabled and whether temperature or humidity is read first.
+- In the `Power Management` submenu, you can choose the power saving mode, change the interval for station to listen to beacon, time for waiting beacon before station disconnects from SoftAP and maximum and minimum CPU frequency
 
 ### Hardware Required
 
